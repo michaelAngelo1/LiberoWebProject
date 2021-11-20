@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 ]
 
 # Middleware framework
@@ -107,6 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 LANGUAGE_CODE = 'en-us'
+USE_THOUSAND_SEPARATOR = True
 TIME_ZONE = 'Asia/Jakarta'
 USE_I18N = True
 USE_L10N = True
@@ -116,3 +118,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
+
+DECIMAL_SEPARATOR = ','
+THOUSAND_SEPARATOR = '.'
+NUMBER_GROUPING = 3

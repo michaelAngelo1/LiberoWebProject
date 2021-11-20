@@ -3,6 +3,7 @@ Definition of models.
 """
 
 from django.db import models
+from django.urls import reverse
 
 # Create your models here.
 
@@ -42,7 +43,9 @@ class Pelanggan(models.Model):
     Operator = models.CharField(max_length=20, null=True, db_column="Operator", blank=True)
     TglEntry = models.DateTimeField(null=True, blank=True, db_column="TglEntry")
 
-    
+    def jumlah_kontrak(self):
+        return self.kontrak_set.count()
+
     def __str__(self):
         if self.Nama is not None:
             return self.Nama
@@ -52,6 +55,7 @@ class Pelanggan(models.Model):
     class Meta:
         db_table = "Pelanggan"
         managed = False
+        verbose_name_plural = "Pelanggan"
 
 class Penawaran(models.Model):
     Kode = models.CharField(max_length=10, primary_key=True, db_column="Kode")
@@ -66,7 +70,7 @@ class Penawaran(models.Model):
     CreateBy = models.CharField(max_length=50, null=True, blank=True, db_column="CreateBy")
     Operator = models.CharField(max_length=50, null=True, blank=True, db_column="Operator")
     TglEntry = models.DateTimeField(null=True, blank=True, db_column="TglEntry")
-    Sales = models.CharField(max_length=10, null=True, blank=True, db_column="Sales")
+    Sales = models.ForeignKey("Pegawai", db_column="Sales", on_delete=models.SET_NULL, null=True, blank=True)
     TanggalPeriode = models.DateTimeField(null=True, blank=True, db_column="TanggalPeriode")
     Status = models.CharField(max_length=20, null=True, blank=True, db_column="Status")
     NoPenawaran = models.CharField(max_length=50, null=True, blank=True, db_column="NoPenawaran")
@@ -76,17 +80,21 @@ class Penawaran(models.Model):
     ReferralLead = models.CharField(max_length=250, null=True, blank=True, db_column="ReferralLead")
 
     def __str__(self):
-        if self.Kode is not None:
-            return self.Kode
+        if self.pelanggan is not None:
+            return (self.Kode + " / " + self.pelanggan.Nama)
         else:
             return ""
 
     class Meta:
         db_table = "Penawaran"
         managed = False
+        verbose_name_plural = "Penawaran"
+
+    def get_absolute_url(self):
+        return reverse('penawaran_list')
 
 class Kontrak(models.Model):
-    Kode = models.CharField(max_length=10, primary_key=True, db_column="Kode")
+    Kode = models.CharField(max_length=10, primary_key=True, db_column="Kode", default="New")
     penawaran = models.ForeignKey('Penawaran', db_column="Penawaran", on_delete=models.SET_NULL, null=True, blank=True)
     JobLama = models.ForeignKey('self', on_delete=models.SET_NULL, db_column="JobLama", null=True, blank=True)
     Grup = models.CharField(max_length=10, db_column="Grup", null=True, blank=True)
@@ -100,9 +108,9 @@ class Kontrak(models.Model):
     Operator = models.CharField(max_length=10, null=True, blank=True, db_column="Operator")
     TglEntry = models.DateTimeField(null=True, blank=True, db_column="TglEntry")
     TanggalKontrak = models.DateTimeField(null=True, blank=True, db_column="TanggalKontrak")
-    Pegawai = models.CharField(max_length=10, null=True, blank=True, db_column="Pegawai")
+    Pegawai = models.ForeignKey("Pegawai", db_column="Pegawai", on_delete=models.SET_NULL, null=True, blank=True, related_name="Pegawai")
     InsentifAdmin = models.DecimalField(max_digits=12, decimal_places=4, db_column="InsentifAdmin", null=True, blank=True)
-    Teknisi = models.CharField(max_length=10, null=True, blank=True, db_column="Teknisi")
+    Teknisi = models.ForeignKey("Pegawai", db_column="Teknisi", on_delete=models.SET_NULL, null=True, blank=True, related_name="Teknisi")
     InsentifTeknisi = models.DecimalField(max_digits=12, decimal_places=4, db_column="InsentifTeknisi", null=True, blank=True)
     InsentifSales = models.DecimalField(max_digits=12, decimal_places=4, db_column="InsentifSales", null=True, blank=True)
     JumlahDokumen = models.IntegerField(null=True, blank=True, db_column="JumlahDokumen")
@@ -126,6 +134,7 @@ class Kontrak(models.Model):
     Tipe = models.CharField(max_length=50, null=True, blank=True, db_column="Tipe")
     JenisLaporan = models.CharField(max_length=50, null=True, blank=True, db_column="JenisLaporan")
 
+
     def __str__(self):
         if self.Kode is not None:
             return self.Kode
@@ -135,6 +144,7 @@ class Kontrak(models.Model):
     class Meta:
         db_table = "Kontrak"
         managed = False
+        verbose_name_plural = "Kontrak"
 
 # db_column, db_table
 # primary_key
@@ -177,6 +187,7 @@ class Bahan(models.Model):
     class Meta:
         db_table = "Bahan"
         managed = False
+        verbose_name_plural = "Bahan"
 
 class DetailKontrakBahan(models.Model):
     kode = models.IntegerField(primary_key=True, db_column="kode")
@@ -201,7 +212,7 @@ class DetailKontrakPerlengkapan(models.Model):
         managed = False
 
 class STSPR(models.Model):
-    Kode = models.CharField(max_length=10, primary_key=True, db_column="Kode")
+    Kode = models.CharField(max_length=10, primary_key=True, db_column="Kode", default="New")
     JobOrder = models.CharField(max_length=10, null=True, blank=True, db_column="JobOrder")
     KetJasTre = models.TextField(null=True, blank=True, db_column="KetJasTre")
     NoInvoice = models.CharField(max_length=50, null=True, blank=True, db_column="NoInvoice")
@@ -236,6 +247,7 @@ class STSPR(models.Model):
     class Meta:
         db_table = "STSPR"
         managed = False
+        verbose_name_plural = "STSPR"
 
     def __str__(self):
         if self.Kode is not None:
@@ -251,7 +263,7 @@ class DetailSTSPR(models.Model):
     PlafonQty = models.IntegerField(null=True, blank=True, db_column="PlafonQty")
     Invoice = models.CharField(max_length=10, null=True, blank=True, db_column="Invoice")
 
-    class Meta:
+    class Meta:     
         db_table = "DetailSTSPR"
         managed = False
 
@@ -322,3 +334,63 @@ class DetailSTSPRPOut(models.Model):
     class Meta:
         db_table = "DetailSTSPRPOut"
         managed = False
+
+class Pegawai(models.Model):
+    Kode = models.CharField(max_length=10, primary_key=True, db_column="Kode")
+    Nama = models.CharField(max_length=250, null=True, blank=True, db_column="Nama")
+    NIK = models.CharField(max_length=50, null=True, blank=True, db_column="NIK")
+    NoKTP = models.CharField(max_length=50, null=True, blank=True, db_column="NoKTP")
+    NoSIM = models.CharField(max_length=50, null=True, blank=True, db_column="NoSIM")
+    Alamat = models.CharField(max_length=250, null=True, blank=True, db_column="Alamat")
+    TglLahir = models.DateTimeField(null=True, blank=True, db_column="TglLahir")
+    StatusPerkawinan = models.CharField(max_length=20, null=True, blank=True, db_column="StatusPerkawinan")
+    Telp = models.CharField(max_length=20, null=True, blank=True, db_column="Telp")
+    Hp1 = models.CharField(max_length=15, null=True, blank=True, db_column="Hp1")
+    Hp2 = models.CharField(max_length=15, null=True, blank=True, db_column="Hp2")
+    TglBergabung = models.DateTimeField(null=True, blank=True, db_column="TglBergabung")
+    TglKeluar =  models.DateTimeField(null=True, blank=True, db_column="TglKeluar")
+    Keterangan = models.CharField(max_length=50, null=True, blank=True, db_column="Keterangan")
+    Bagian = models.CharField(max_length=50, null=True, blank=True, db_column="Bagian")
+    Jabatan = models.CharField(max_length=50, null=True, blank=True, db_column="Jabatan")
+    Pendidikan = models.CharField(max_length=50, null=True, blank=True, db_column="Pendidikan")
+    NoRekening = models.CharField(max_length=50, null=True, blank=True, db_column="NoRekening")
+    Bank = models.CharField(max_length=100, null=True, blank=True, db_column="Bank")
+    PlafonService = models.DecimalField(max_digits=12, decimal_places=4, db_column="PlafonService", null=True, blank=True)
+    Gaji = models.DecimalField(max_digits=12, decimal_places=4, db_column="Gaji", null=True, blank=True)
+    TunjanganJabatan = models.DecimalField(max_digits=12, decimal_places=4, db_column="TunjanganJabatan", null=True, blank=True)
+    UangMuka = models.DecimalField(max_digits=12, decimal_places=4, db_column="UangMuka", null=True, blank=True)
+    Transport = models.DecimalField(max_digits=12, decimal_places=4, db_column="Transport", null=True, blank=True)
+    Pulsa = models.DecimalField(max_digits=12, decimal_places=4, db_column="Pulsa", null=True, blank=True)
+    Aktif = models.BooleanField(default=True, db_column="Aktif", blank=True, null=True)
+    BPJS =  models.DecimalField(max_digits=12, decimal_places=4, db_column="BPJS", null=True, blank=True)
+    BPJSKetenagaKerjaan =  models.DecimalField(max_digits=12, decimal_places=4, db_column="BPJSKetenagaKerjaan", null=True, blank=True)
+    NPWP = models.CharField(max_length=50, null=True, blank=True, db_column="NPWP")
+    JumlahAnak = models.IntegerField(null=True, db_column="JumlahAnak", blank=True)
+    NoKK = models.CharField(max_length=50, null=True, blank=True, db_column="NoKK")
+    NamaIstri = models.CharField(max_length=50, null=True, blank=True, db_column="NamaIstri")
+    SkillAllowance = models.DecimalField(max_digits=12, decimal_places=4, db_column="SkillAllowance", null=True, blank=True)
+    FumigatorAllowance = models.DecimalField(max_digits=12, decimal_places=4, db_column="FumigatorAllowance", null=True, blank=True)
+    PositionAllowance = models.DecimalField(max_digits=12, decimal_places=4, db_column="PositionAllowance", null=True, blank=True)
+    VehicleRentAllowance = models.DecimalField(max_digits=12, decimal_places=4, db_column="VehicleRentAllowance", null=True, blank=True)
+    CreateDate = models.DateTimeField(null=True, blank=True, db_column="CreateDate")
+    CreateBy = models.CharField(max_length=10, null=True, blank=True, db_column="CreateBy")
+    Operator = models.CharField(max_length=10, null=True, blank=True, db_column="Operator")
+    TglEntry = models.DateTimeField(null=True, blank=True, db_column="TglEntry")
+    Departemen = models.CharField(max_length=250, null=True, blank=True, db_column="Departemen")
+    StatusPajak = models.CharField(max_length=50, null=True, blank=True, db_column="StatusPajak")
+    IuranJKK = models.DecimalField(max_digits=12, decimal_places=4, db_column="IuranJKK", null=True, blank=True)
+    IuranJKM = models.DecimalField(max_digits=12, decimal_places=4, db_column="IuranJKM", null=True, blank=True)
+    IuranJHT = models.DecimalField(max_digits=12, decimal_places=4, db_column="IuranJHT", null=True, blank=True)
+    IuranJHT2 = models.DecimalField(max_digits=12, decimal_places=4, db_column="IuranJHT2", null=True, blank=True)
+    IuranJP = models.DecimalField(max_digits=12, decimal_places=4, db_column="IuranJP", null=True, blank=True)
+
+    class Meta:
+        db_table = "Pegawai"
+        managed = False
+
+    def __str__(self):
+        if self.Nama is not None:
+            return self.Nama
+        else:
+            return ""
+

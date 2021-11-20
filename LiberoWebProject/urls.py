@@ -28,3 +28,9 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
     path('admin/', admin.site.urls),
 ]
+
+urlpatterns += [
+    path("pelanggan/", views.PelangganListView.as_view(), name='pelanggan_list'),
+    path("penawaran/", views.PenawaranListView.as_view(), name='penawaran_list'),
+    path("penawaran/add", views.PenawaranCreateView, name='penawaran_form')
+]

@@ -1,0 +1,32 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<h2>{{ title }}</h2>
+<h3>{{ message }}</h3>
+
+<p>Use this area to provide additional information.</p>
+<a href="{% url 'penawaran_form' %}">Buat penawaran baru</a>
+{% if penawaran_list %}
+  <ul>
+    {% for penawaran in penawaran_list %}
+      <li>
+        {{ penawaran.Kode }}
+        {{ penawaran.pelanggan }} - 
+        {{ penawaran.AlamatTreatment }} - 
+        {{ penawaran.CreateDate }} - 
+        {{ penawaran.TglEntry }} - 
+        {{ penawaran.CreateBy }} - 
+        {{ penawaran.Operator }} - 
+        
+        {% load humanize %}
+        {{ penawaran.Harga|intcomma }}
+      </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>Tidak ada penawaran.</p>
+  {% endif %} 
+
+
+{% endblock %}

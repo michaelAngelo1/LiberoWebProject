@@ -60,6 +60,8 @@
     <Folder Include="LiberoWebProject\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\templates\app\penawaran_list.html" />
+    <Content Include="app\templates\app\penawaran_form.html" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />

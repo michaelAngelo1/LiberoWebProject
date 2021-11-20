@@ -1,0 +1,18 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<h2>{{ title }}</h2>
+<h3>{{ message }}</h3>
+
+<p>Use this area to provide additional information.</p>
+
+    <h1>Add or Update Author</h1>
+  <form action="" method="post">
+    {% csrf_token %}
+    <table>
+    </table>
+    <input type="submit" value="Submit">
+  </form>
+
+{% endblock %}
